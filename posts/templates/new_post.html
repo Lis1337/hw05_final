@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %} {{ words.0 }} записи {% endblock %}
+
+{% block content %}
+<h1>{{ words.1 }} запись</h1>
+<form method="post" enctype="multipart/form-data" class="post-form">
+  
+{% csrf_token %}
+{{ form.as_p }} 
+  <button type="submit">Сохранить</button>
+</form>
+{% endblock %}
