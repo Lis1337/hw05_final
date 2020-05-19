@@ -30,18 +30,23 @@
                                             </div>
                                     </li>
                                     <li class="list-group-item">
+
                                         {% if user_profile != request.user %}
                                         {% if following %}
+
                                         <a class="btn btn-lg btn-light" 
                                                 href="{% url 'profile_unfollow' user_profile.username %}" role="button"> 
                                                 Отписаться 
                                         </a> 
+
                                         {% else %}
+
                                         <a class="btn btn-lg btn-primary" 
                                                 href="{% url 'profile_follow' user_profile.username %}" role="button">
                                         Подписаться 
                                         </a>
-                                        {% endif %}
+
+                                        {% endif %}                                        
                                         {% endif %}
                                     </li>
                             </ul>

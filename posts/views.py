@@ -127,41 +127,25 @@ def add_comment(request, username, post_id):
 
 @login_required
 def follow_index(request):
-    follow_set = Follow.objects.filter(user=request.user)
-    post_list = Post.objects.filter(author__in=[follow.author_id for follow in follow_set]).order_by("-pub_date")
-
+    post_list = Post.objects.select_related("author") \
+        .filter(author__following__in=Follow.objects.filter(user=request.user)).order_by('-pub_date').all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, "follow.html", {
-        "page": page,
-        'paginator': paginator,
-        "post_list": post_list
-    })
+    return render(request, "follow.html", {"page": page, "paginator": paginator})
 
 
 @login_required
 def profile_follow(request, username):
-    profile = request.user
-    author = get_object_or_404(User, username=username)
-    following = Follow.objects.filter(user=profile, author=author).exists()
-
-    if following == True:
-        return redirect("profile", username=username)
-    elif profile != author:
-        Follow.objects.create(user=profile, author=author)
-        return redirect("profile", username=username)
-    return redirect("profile", username=username)
+        author = get_object_or_404(User, username=username)
+        if author != request.user:
+            Follow.objects.get_or_create(user=request.user, author=author)
+        return redirect('profile', username=username)
 
 
 @login_required
 def profile_unfollow(request, username):
-    profile = request.user
-    author = get_object_or_404(User, username=username)
-    following = Follow.objects.filter(user=profile, author=author).exists()
-
-    if following == True:
-        Follow.objects.filter(user=profile, author=author).delete()
-        return redirect("profile", username=username)
-    return redirect("profile", username=username)
+    author = get_object_or_404(User, username=username) 
+    Follow.objects.filter(user=request.user, author=author).delete()
+    return redirect("profile", username=username) 
     
